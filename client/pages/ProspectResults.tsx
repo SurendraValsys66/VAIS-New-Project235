@@ -1696,18 +1696,15 @@ export default function ProspectResults() {
                                     <Sheet>
                                       <SheetTrigger asChild>
                                         <Button
-                                          variant="default"
+                                          variant="ghost"
                                           size="sm"
-                                          className="bg-valasys-orange hover:bg-valasys-orange/90 text-white gap-1 h-8 flex-shrink-0"
-                                          aria-label="Quick view prospect"
+                                          className="h-8 w-8 p-0 hover:bg-gray-200 flex-shrink-0"
+                                          aria-label="View prospect details"
                                           onClick={() =>
                                             setSelectedProspect(prospect)
                                           }
                                         >
-                                          <Eye className="w-4 h-4" />
-                                          <span className="text-xs font-medium">
-                                            Quick View
-                                          </span>
+                                          <ExternalLink className="w-4 h-4 text-gray-600" />
                                         </Button>
                                       </SheetTrigger>
                                       <SheetContent
@@ -1790,7 +1787,7 @@ export default function ProspectResults() {
                                             </div>
                                           </SheetTitle>
                                           <SheetDescription>
-                                            Quick prospect overview
+                                            Prospect details
                                           </SheetDescription>
                                         </SheetHeader>
 
