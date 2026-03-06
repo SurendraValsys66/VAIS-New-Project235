@@ -24,6 +24,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
@@ -286,6 +287,8 @@ export default function CampaignOverview() {
 
   // Campaign acceptance state
   const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+  const [isDeclineModalOpen, setIsDeclineModalOpen] = useState(false);
+  const [declineRemark, setDeclineRemark] = useState("");
   const [selectedLeads, setSelectedLeads] = useState<{
     cs: boolean;
     mql: boolean;
@@ -417,11 +420,16 @@ export default function CampaignOverview() {
   };
 
   const handleDeclineCampaign = () => {
-    // Here you would typically call an API to decline the campaign
-    console.log("Campaign declined");
+    setIsDeclineModalOpen(true);
+  };
+
+  const handleConfirmDecline = () => {
+    // Here you would typically call an API to decline the campaign with the remark
+    console.log("Campaign declined with remark:", declineRemark);
     toast.error("Campaign declined", {
       description: "You declined to accept this campaign.",
     });
+    setIsDeclineModalOpen(false);
     navigate("/build-my-campaign?tab=requests");
   };
 
@@ -1637,6 +1645,54 @@ export default function CampaignOverview() {
                 disabled={Object.entries(campaignCounts).some(([key, count]) => selectedLeads[key as keyof typeof selectedLeads] && count > 500)}
               >
                 Confirm & Accept
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Decline Campaign Confirmation Modal */}
+        <Dialog
+          open={isDeclineModalOpen}
+          onOpenChange={(open) => {
+            setIsDeclineModalOpen(open);
+            if (!open) setDeclineRemark("");
+          }}
+        >
+          <DialogContent className="max-w-[95vw] sm:max-w-[85vw] md:max-w-[500px] lg:max-w-[400px]">
+            <DialogHeader>
+              <DialogTitle className="text-xl">Decline Campaign</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to decline this campaign request? Please
+                provide a reason for declining.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="py-4">
+              <Label htmlFor="declineRemark" className="mb-2 block text-sm font-medium">
+                Remark / Reason for declining
+              </Label>
+              <Textarea
+                id="declineRemark"
+                placeholder="Enter your remark here..."
+                value={declineRemark}
+                onChange={(e) => setDeclineRemark(e.target.value)}
+                className="min-h-[100px] focus-visible:ring-valasys-orange"
+              />
+            </div>
+
+            <DialogFooter className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsDeclineModalOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white flex-1"
+                onClick={handleConfirmDecline}
+                disabled={!declineRemark.trim()}
+              >
+                Confirm
               </Button>
             </DialogFooter>
           </DialogContent>
