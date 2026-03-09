@@ -58,11 +58,11 @@ export default function LandingPages() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-3">
               <div className="w-10 h-10 bg-valasys-orange rounded-xl flex items-center justify-center text-white shadow-lg">
                 <Layout className="w-6 h-6" />
               </div>
@@ -72,7 +72,7 @@ export default function LandingPages() {
           </div>
           <Button
             onClick={handleCreateNew}
-            className="bg-valasys-orange hover:bg-valasys-orange/90 text-white px-6 py-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all font-bold text-lg group"
+            className="bg-valasys-orange hover:bg-valasys-orange/90 text-white px-6 py-6 rounded-2xl shadow-xl hover:shadow-2xl transition-all font-bold text-base group"
           >
             <Plus className="w-5 h-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
             Create New Page
@@ -88,18 +88,18 @@ export default function LandingPages() {
                 placeholder="Search your pages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 py-7 rounded-2xl border-gray-100 shadow-sm focus:ring-valasys-orange focus:border-valasys-orange text-lg"
+                className="pl-12 py-7 rounded-2xl border-gray-100 shadow-sm focus:ring-valasys-orange focus:border-valasys-orange text-base"
               />
             </div>
           </div>
           <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 flex items-center justify-around">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{pages.length}</div>
+              <div className="text-xl font-bold text-gray-900">{pages.length}</div>
               <div className="text-[10px] uppercase font-bold text-gray-400">Total Pages</div>
             </div>
             <div className="w-px h-8 bg-gray-200" />
             <div className="text-center">
-              <div className="text-2xl font-bold text-valasys-orange">12.4k</div>
+              <div className="text-xl font-bold text-valasys-orange">12.4k</div>
               <div className="text-[10px] uppercase font-bold text-gray-400">Total Views</div>
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function LandingPages() {
               <div className="p-6 flex-1 flex flex-col">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-valasys-orange transition-colors">{page.name}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-valasys-orange transition-colors">{page.name}</h3>
                     <div className="flex items-center gap-3 text-xs text-gray-400">
                       <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> Updated {new Date(page.updatedAt).toLocaleDateString()}</span>
                     </div>
@@ -160,7 +160,7 @@ export default function LandingPages() {
               <Plus className="w-8 h-8" />
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold">Create New Page</div>
+              <div className="text-base font-bold">Create New Page</div>
               <div className="text-xs font-medium opacity-60">Start with a blank canvas</div>
             </div>
           </button>
