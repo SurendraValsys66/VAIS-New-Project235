@@ -1,4 +1,5 @@
 export { OnlineMarketingConferenceTemplate } from "./OnlineMarketingConference";
+export { templateLayoutMap, onlineMarketingConferenceLayout } from "./templates";
 
 export const PREDEFINED_TEMPLATES = [
   {

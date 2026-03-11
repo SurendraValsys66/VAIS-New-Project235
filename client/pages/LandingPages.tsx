@@ -34,16 +34,19 @@ export default function LandingPages() {
   const [view, setView] = useState<View>("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
+  const [templateInEditor, setTemplateInEditor] = useState<string | null>(null);
   const [pages, setPages] = useState<PageData[]>([
     { id: "1", name: "Modern Hero Page", updatedAt: "2024-03-20T10:00:00Z" },
     { id: "2", name: "SaaS Product Landing", updatedAt: "2024-03-19T15:30:00Z" },
   ]);
 
   const handleCreateNew = () => {
+    setTemplateInEditor(null);
     setView("editor");
   };
 
   const handleEdit = (id: string) => {
+    setTemplateInEditor(null);
     setView("editor");
   };
 
@@ -57,19 +60,21 @@ export default function LandingPages() {
   };
 
   const handleUseTemplate = (templateId: string) => {
-    // This would create a new page from the template
+    // Set the template to be loaded in the editor
+    setTemplateInEditor(templateId);
     setView("editor");
   };
 
   const handleBack = () => {
     setView("list");
     setSelectedTemplate(null);
+    setTemplateInEditor(null);
   };
 
   if (view === "editor") {
     return (
       <DndProvider backend={HTML5Backend}>
-        <BuilderCanvas onBack={handleBack} />
+        <BuilderCanvas onBack={handleBack} templateId={templateInEditor || undefined} />
       </DndProvider>
     );
   }

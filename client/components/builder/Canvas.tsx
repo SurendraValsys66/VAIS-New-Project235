@@ -1,53 +1,63 @@
 import React from "react";
 import { useDrop } from "react-dnd";
-import { DRAG_TYPES, ComponentType } from "@/types/builder";
+import { DRAG_TYPES, ComponentType, BuilderComponent } from "@/types/builder";
 import { cn } from "@/lib/utils";
 import { useLayout } from "@/hooks/useLayout";
 import { ComponentRenderer } from "./Renderer";
 import { Sidebar } from "./Sidebar";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { templateLayoutMap } from "@/components/predefine-email-templates/templates";
 
 interface BuilderCanvasProps {
   onBack?: () => void;
+  templateId?: string;
 }
 
-export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ onBack }) => {
-  const { layout, addComponent, moveComponent, updateComponent, removeComponent } = useLayout([
-    {
-      id: "root-hero-1",
-      type: "hero",
-      props: {},
-      height: 600,
-    },
-    {
-      id: "root-logo-cloud-1",
-      type: "logo-cloud",
-      props: {},
-    },
-    {
-      id: "root-section-1",
-      type: "section",
-      props: {},
-      children: [
-        {
-          id: "root-row-1",
-          type: "row",
-          props: {},
-          children: [
-            {
-              id: "root-col-1",
-              type: "column",
-              width: 12,
-              children: [
-                { id: "root-feature-grid-1", type: "feature-grid", props: {} },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ]);
+const DEFAULT_LAYOUT: BuilderComponent[] = [
+  {
+    id: "root-hero-1",
+    type: "hero",
+    props: {},
+    height: 600,
+  },
+  {
+    id: "root-logo-cloud-1",
+    type: "logo-cloud",
+    props: {},
+  },
+  {
+    id: "root-section-1",
+    type: "section",
+    props: {},
+    children: [
+      {
+        id: "root-row-1",
+        type: "row",
+        props: {},
+        children: [
+          {
+            id: "root-col-1",
+            type: "column",
+            width: 12,
+            children: [
+              { id: "root-feature-grid-1", type: "feature-grid", props: {} },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+];
+
+export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ onBack, templateId }) => {
+  const initialLayout = templateId
+    ? templateLayoutMap[templateId] || DEFAULT_LAYOUT
+    : DEFAULT_LAYOUT;
+
+  const { layout, addComponent, moveComponent, updateComponent, removeComponent } = useLayout(
+    initialLayout,
+  );
 
   const [{ isOver, canDrop }, drop] = useDrop({
     accept: DRAG_TYPES.COMPONENT,
@@ -90,7 +100,11 @@ export const BuilderCanvas: React.FC<BuilderCanvasProps> = ({ onBack }) => {
             )}
             <div className="h-6 w-px bg-gray-200" />
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-gray-900 tracking-tight">New Page</span>
+              <span className="text-sm font-bold text-gray-900 tracking-tight">
+                {templateId === "online-marketing-conference"
+                  ? "Online Marketing Conference"
+                  : "New Page"}
+              </span>
               <span className="text-[10px] px-2 py-0.5 bg-valasys-orange/10 text-valasys-orange rounded-full font-black uppercase tracking-wider">
                 Editing
               </span>
