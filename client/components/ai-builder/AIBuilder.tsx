@@ -289,7 +289,7 @@ export const AIBuilder: React.FC<AIBuilderProps> = ({ onBack, onGenerateComplete
           {/* Left Chat Sidebar */}
           <div className="w-96 border-r border-gray-200 flex flex-col bg-white">
             {/* Header */}
-            <div className="border-b border-gray-200 bg-white px-4 py-3 flex items-center justify-between">
+            <div className="border-b border-gray-200 bg-white flex items-center justify-between px-3 py-2">
               <h2 className="text-base font-bold text-gray-900">AI Builder Chat</h2>
               <Button
                 onClick={onBack}
@@ -302,7 +302,7 @@ export const AIBuilder: React.FC<AIBuilderProps> = ({ onBack, onGenerateComplete
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+            <div className="flex-1 overflow-y-auto space-y-2 p-2">
               {chatMessages.map((message) => (
                 <div
                   key={message.id}
@@ -395,7 +395,7 @@ export const AIBuilder: React.FC<AIBuilderProps> = ({ onBack, onGenerateComplete
             </div>
 
             {/* Input Section */}
-            <div className="border-t border-gray-200 bg-white px-4 py-3">
+            <div className="border-t border-gray-200 bg-white p-2">
               <div className="relative">
                 <Textarea
                   placeholder="Ask for refinements..."
@@ -403,7 +403,7 @@ export const AIBuilder: React.FC<AIBuilderProps> = ({ onBack, onGenerateComplete
                   onChange={(e) => setPrompt(e.target.value)}
                   disabled={isGenerating}
                   rows={2}
-                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-valasys-orange focus:border-valasys-orange text-xs resize-none pr-28"
+                  className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-valasys-orange focus:border-valasys-orange text-xs resize-none pr-24"
                 />
                 <div className="absolute bottom-2 right-2 flex gap-1 items-center">
                   <select
