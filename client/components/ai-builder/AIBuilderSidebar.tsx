@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Search, Settings, MessageSquare, FolderOpen, Grid3x3, Code, ChevronDown } from "lucide-react";
+import { Plus, Settings, MessageSquare, FolderOpen, Grid3x3, Code, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -36,14 +36,6 @@ export const AIBuilderSidebar: React.FC = () => {
           New chat
         </Button>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder="Search"
-            className="pl-9 h-8 text-sm border-gray-200"
-          />
-        </div>
       </div>
 
       {/* Recents Section */}
