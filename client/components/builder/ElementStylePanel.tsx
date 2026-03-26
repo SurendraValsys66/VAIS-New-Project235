@@ -129,23 +129,36 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
     type?: string;
     placeholder?: string;
   }) => {
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
     const handleNumberKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (type !== "number") return;
 
       const currentValue = Number(value) || 0;
       let newValue = currentValue;
+      let shouldUpdate = false;
 
       if (e.key === "ArrowUp") {
         e.preventDefault();
         newValue = currentValue + 1;
+        shouldUpdate = true;
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         newValue = Math.max(0, currentValue - 1);
+        shouldUpdate = true;
       }
 
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      if (shouldUpdate) {
         onChange(String(newValue));
       }
+    };
+
+    const handleNumberFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+      if (type !== "number") return;
+      // Select all text when focused so you can start typing immediately
+      setTimeout(() => {
+        e.target.select();
+      }, 0);
     };
 
     return (
@@ -169,10 +182,13 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
         ) : (
           <div className="flex items-center gap-2">
             <Input
+              ref={inputRef}
               type={type}
+              inputMode={type === "number" ? "numeric" : undefined}
               value={value}
               onChange={(e) => onChange(e.target.value)}
               onKeyDown={handleNumberKeyDown}
+              onFocus={handleNumberFocus}
               placeholder={placeholder}
               className="h-9 text-sm"
             />
