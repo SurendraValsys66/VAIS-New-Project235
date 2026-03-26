@@ -165,45 +165,78 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
     onChange,
     type = "text",
     placeholder = "",
+    max = 999,
+    isPercentage = false,
   }: {
     label: string;
     value: string;
     onChange: (value: string) => void;
     type?: string;
     placeholder?: string;
+    max?: number;
+    isPercentage?: boolean;
   }) => {
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const maxValue = isPercentage ? 100 : max;
+
+    const clampValue = (val: number): number => {
+      return Math.max(0, Math.min(val, maxValue));
+    };
+
+    const handleNumberChange = (newVal: string) => {
+      // Allow empty string for clearing
+      if (newVal === "") {
+        onChange("");
+        return;
+      }
+
+      const numVal = Number(newVal);
+      if (!isNaN(numVal)) {
+        const clamped = clampValue(numVal);
+        onChange(String(clamped));
+      }
+    };
 
     const handleNumberKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (type !== "number") return;
 
-      // Only prevent default for arrow keys
+      // Prevent default for arrow keys to stop scrolling
       if (e.key === "ArrowUp" || e.key === "ArrowDown") {
         e.preventDefault();
         e.stopPropagation();
 
         const currentValue = Number(value) || 0;
-        let newValue = currentValue;
+        const increment = e.shiftKey ? 10 : 1;
 
+        let newValue = currentValue;
         if (e.key === "ArrowUp") {
-          newValue = currentValue + 1;
+          newValue = clampValue(currentValue + increment);
         } else if (e.key === "ArrowDown") {
-          newValue = Math.max(0, currentValue - 1);
+          newValue = clampValue(currentValue - increment);
         }
 
         onChange(String(newValue));
-
-        // Re-focus the input after the change
-        setTimeout(() => {
-          inputRef.current?.focus();
-        }, 0);
       }
     };
 
     const handleNumberFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       if (type !== "number") return;
       // Select all text when focused so you can start typing immediately
-      e.target.select();
+      setTimeout(() => {
+        e.target.select();
+      }, 0);
+    };
+
+    const decrementValue = () => {
+      const current = Number(value) || 0;
+      const newVal = clampValue(current - 1);
+      onChange(String(newVal));
+    };
+
+    const incrementValue = () => {
+      const current = Number(value) || 0;
+      const newVal = clampValue(current + 1);
+      onChange(String(newVal));
     };
 
     return (
@@ -226,34 +259,54 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
           </div>
         ) : (
           <div className={cn("flex items-center gap-1", label ? "" : "flex-1")}>
-            <span className="text-xs text-gray-600">▧</span>
+            {type === "number" && <span className="text-xs text-gray-600">▧</span>}
             <Input
               ref={inputRef}
-              type={type}
+              type={type === "number" ? "text" : type}
               inputMode={type === "number" ? "numeric" : undefined}
               value={value}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={(e) => {
+                if (type === "number") {
+                  handleNumberChange(e.target.value);
+                } else {
+                  onChange(e.target.value);
+                }
+              }}
               onKeyDown={handleNumberKeyDown}
               onFocus={handleNumberFocus}
               placeholder={placeholder}
               className={cn("h-8 text-sm", label ? "" : "flex-1")}
             />
-            {type === "number" && <span className="text-xs text-gray-500 whitespace-nowrap">px</span>}
-            {type === "number" && !label && (
-              <div className="flex items-center gap-0.5">
-                <button
-                  onClick={() => onChange(String(Math.max(0, (Number(value) || 0) - 1)))}
-                  className="px-1.5 py-1 hover:bg-gray-200 rounded text-xs"
-                >
-                  ▼
-                </button>
-                <button
-                  onClick={() => onChange(String((Number(value) || 0) + 1))}
-                  className="px-1.5 py-1 hover:bg-gray-200 rounded text-xs"
-                >
-                  ▲
-                </button>
-              </div>
+            {type === "number" && (
+              <>
+                <span className="text-xs text-gray-500 whitespace-nowrap">
+                  {isPercentage ? "%" : "px"}
+                </span>
+                <div className="flex items-center gap-0">
+                  <button
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      decrementValue();
+                      inputRef.current?.focus();
+                    }}
+                    className="px-1.5 py-1 hover:bg-gray-200 active:bg-gray-300 rounded-l text-xs font-semibold transition-colors"
+                    title="Decrease (or use Down arrow)"
+                  >
+                    ▼
+                  </button>
+                  <button
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      incrementValue();
+                      inputRef.current?.focus();
+                    }}
+                    className="px-1.5 py-1 hover:bg-gray-200 active:bg-gray-300 rounded-r text-xs font-semibold transition-colors"
+                    title="Increase (or use Up arrow)"
+                  >
+                    ▲
+                  </button>
+                </div>
+              </>
             )}
           </div>
         )}
@@ -343,6 +396,8 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                 onChange={(value) => handleStyleChange("width", value)}
                 type="number"
                 placeholder="100"
+                max={100}
+                isPercentage={true}
               />
               <StyleInput
                 label="Height (px)"
@@ -350,6 +405,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                 onChange={(value) => handleStyleChange("height", value)}
                 type="number"
                 placeholder="auto"
+                max={999}
               />
               <StyleInput
                 label="Font Size (px)"
@@ -357,6 +413,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                 onChange={(value) => handleStyleChange("fontSize", value)}
                 type="number"
                 placeholder="16"
+                max={999}
               />
             </>
           )}
@@ -397,6 +454,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                     }}
                     type="number"
                     placeholder="0"
+                    max={200}
                   />
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
@@ -406,6 +464,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("paddingTop", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                     <StyleInput
                       label="Right"
@@ -413,6 +472,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("paddingRight", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                     <StyleInput
                       label="Bottom"
@@ -420,6 +480,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("paddingBottom", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                     <StyleInput
                       label="Left"
@@ -427,6 +488,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("paddingLeft", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                   </div>
                 )}
@@ -462,6 +524,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                     }}
                     type="number"
                     placeholder="0"
+                    max={200}
                   />
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
@@ -471,6 +534,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("marginTop", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                     <StyleInput
                       label="Right"
@@ -478,6 +542,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("marginRight", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                     <StyleInput
                       label="Bottom"
@@ -485,6 +550,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("marginBottom", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                     <StyleInput
                       label="Left"
@@ -492,6 +558,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       onChange={(value) => handleStyleChange("marginLeft", value)}
                       type="number"
                       placeholder="0"
+                      max={200}
                     />
                   </div>
                 )}
@@ -511,6 +578,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                 onChange={(value) => handleStyleChange("borderWidth", value)}
                 type="number"
                 placeholder="0"
+                max={50}
               />
               <StyleInput
                 label="Border Radius (px)"
@@ -518,6 +586,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                 onChange={(value) => handleStyleChange("borderRadius", value)}
                 type="number"
                 placeholder="0"
+                max={200}
               />
             </>
           )}
