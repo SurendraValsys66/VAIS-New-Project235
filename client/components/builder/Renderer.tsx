@@ -348,6 +348,10 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
             className="w-full focus:outline-none focus:ring-0"
             contentEditable
             suppressContentEditableWarning
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              onUpdate(component.id, { contentText: text });
+            }}
             style={{
               color: component.textColor || "#111827",
               fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
@@ -362,7 +366,7 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
               boxShadow: "none !important",
             }}
           >
-            Catchy Heading
+            {component.contentText || "Catchy Heading"}
           </h2>
         </div>,
       );
@@ -373,6 +377,10 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
             className="focus:outline-none focus:ring-0"
             contentEditable
             suppressContentEditableWarning
+            onBlur={(e) => {
+              const text = e.currentTarget.textContent || "";
+              onUpdate(component.id, { contentText: text });
+            }}
             style={{
               color: component.textColor || "#4b5563",
               fontSize: component.fontSize ? `${component.fontSize}${component.fontSizeUnit || "px"}` : undefined,
@@ -387,7 +395,7 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
               boxShadow: "none !important",
             }}
           >
-            Add your description text here. Make it compelling and easy to read for your visitors.
+            {component.contentText || "Add your description text here. Make it compelling and easy to read for your visitors."}
           </p>
         </div>,
       );

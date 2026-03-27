@@ -115,6 +115,7 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
   });
 
   const [expandedSections, setExpandedSections] = React.useState({
+    content: true,
     alignment: true,
     background: true,
     colors: true,
@@ -494,6 +495,28 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto min-h-0">
+        {/* Content Section - for editable text components */}
+        {(component.type === "heading" || component.type === "paragraph") && (
+          <div>
+            <SectionHeader title="Content" section="content" />
+            {expandedSections.content && (
+              <div className="px-4 py-3 space-y-3 bg-gray-50 border-b border-gray-200">
+                <div>
+                  <label className="text-xs font-semibold text-gray-700 block mb-2">
+                    {component.type === "heading" ? "Heading Text" : "Paragraph Text"}
+                  </label>
+                  <textarea
+                    value={component.contentText || ""}
+                    onChange={(e) => onUpdate({ contentText: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-20"
+                    placeholder={component.type === "heading" ? "Enter heading text..." : "Enter paragraph text..."}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Alignment Section */}
         <div>
           <SectionHeader title="Alignment" section="alignment" />
