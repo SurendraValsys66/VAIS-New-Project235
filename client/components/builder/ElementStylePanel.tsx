@@ -53,12 +53,16 @@ interface StyleState {
   // Hero element sizing
   badgeWidth: string;
   badgeFontSize: string;
+  badgeFontSizeUnit: "%" | "px" | "rem";
   headingWidth: string;
   headingFontSize: string;
+  headingFontSizeUnit: "%" | "px" | "rem";
   paragraphWidth: string;
   paragraphFontSize: string;
+  paragraphFontSizeUnit: "%" | "px" | "rem";
   buttonWidth: string;
   buttonFontSize: string;
+  buttonFontSizeUnit: "%" | "px" | "rem";
   selectedHeroElement?: string;
 }
 
@@ -132,12 +136,16 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
     // Hero element sizing
     badgeWidth: "",
     badgeFontSize: "",
+    badgeFontSizeUnit: "rem",
     headingWidth: "",
     headingFontSize: "",
+    headingFontSizeUnit: "rem",
     paragraphWidth: "",
     paragraphFontSize: "",
+    paragraphFontSizeUnit: "rem",
     buttonWidth: "",
     buttonFontSize: "",
+    buttonFontSizeUnit: "rem",
     selectedHeroElement: "",
   });
 
@@ -270,12 +278,16 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
         // Hero element sizing
         badgeWidth: component.badgeWidth ? clampPercentWidth(String(component.badgeWidth)) : "",
         badgeFontSize: component.badgeFontSize ? String(component.badgeFontSize) : "",
+        badgeFontSizeUnit: component.badgeFontSizeUnit || "rem",
         headingWidth: component.headingWidth ? clampPercentWidth(String(component.headingWidth)) : "",
         headingFontSize: component.headingFontSize ? String(component.headingFontSize) : "",
+        headingFontSizeUnit: component.headingFontSizeUnit || "rem",
         paragraphWidth: component.paragraphWidth ? clampPercentWidth(String(component.paragraphWidth)) : "",
         paragraphFontSize: component.paragraphFontSize ? String(component.paragraphFontSize) : "",
+        paragraphFontSizeUnit: component.paragraphFontSizeUnit || "rem",
         buttonWidth: component.buttonWidth ? clampPercentWidth(String(component.buttonWidth)) : "",
         buttonFontSize: component.buttonFontSize ? String(component.buttonFontSize) : "",
+        buttonFontSizeUnit: component.buttonFontSizeUnit || "rem",
         selectedHeroElement: component.selectedHeroElement || "",
       });
 
@@ -295,12 +307,16 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
     component?.heroSecondaryButtonText,
     component?.badgeWidth,
     component?.badgeFontSize,
+    component?.badgeFontSizeUnit,
     component?.headingWidth,
     component?.headingFontSize,
+    component?.headingFontSizeUnit,
     component?.paragraphWidth,
     component?.paragraphFontSize,
+    component?.paragraphFontSizeUnit,
     component?.buttonWidth,
     component?.buttonFontSize,
+    component?.buttonFontSizeUnit,
     component?.selectedHeroElement,
     clampPercentWidth,
   ]);
@@ -441,6 +457,20 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
       onUpdate(updates);
     },
     [onUpdate]
+  );
+
+  const handleHeroFontSizeUnitChange = React.useCallback(
+    (
+      property: "badgeFontSizeUnit" | "headingFontSizeUnit" | "paragraphFontSizeUnit" | "buttonFontSizeUnit",
+      newUnit: "%" | "px" | "rem",
+    ) => {
+      setStyles((prev) => ({
+        ...prev,
+        [property]: newUnit,
+      }));
+      onUpdate({ [property]: newUnit } as Partial<BuilderComponent>);
+    },
+    [onUpdate],
   );
 
   const toggleSection = React.useCallback(
@@ -1235,7 +1265,14 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                       placeholder="1.125"
                       className="flex-1 text-xs h-8"
                     />
-                    <span className="text-xs text-gray-500">rem</span>
+                    <select
+                      value={styles.paragraphFontSizeUnit}
+                      onChange={(e) => handleHeroFontSizeUnitChange("paragraphFontSizeUnit", e.target.value as "%" | "px" | "rem")}
+                      className="px-2 py-1 h-8 border border-gray-200 rounded text-xs font-medium bg-white cursor-pointer hover:border-gray-300 transition-colors"
+                    >
+                      <option value="rem">rem</option>
+                      <option value="px">px</option>
+                    </select>
                   </div>
                 </>
               )}
@@ -1281,7 +1318,14 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                           placeholder="0.75"
                           className="flex-1 text-xs h-8"
                         />
-                        <span className="text-xs text-gray-500">rem</span>
+                        <select
+                          value={styles.badgeFontSizeUnit}
+                          onChange={(e) => handleHeroFontSizeUnitChange("badgeFontSizeUnit", e.target.value as "%" | "px" | "rem")}
+                          className="px-2 py-1 h-8 border border-gray-200 rounded text-xs font-medium bg-white cursor-pointer hover:border-gray-300 transition-colors"
+                        >
+                          <option value="rem">rem</option>
+                          <option value="px">px</option>
+                        </select>
                       </div>
                     </>
                   )}
@@ -1310,7 +1354,14 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                           placeholder="3.75"
                           className="flex-1 text-xs h-8"
                         />
-                        <span className="text-xs text-gray-500">rem</span>
+                        <select
+                          value={styles.headingFontSizeUnit}
+                          onChange={(e) => handleHeroFontSizeUnitChange("headingFontSizeUnit", e.target.value as "%" | "px" | "rem")}
+                          className="px-2 py-1 h-8 border border-gray-200 rounded text-xs font-medium bg-white cursor-pointer hover:border-gray-300 transition-colors"
+                        >
+                          <option value="rem">rem</option>
+                          <option value="px">px</option>
+                        </select>
                       </div>
                     </>
                   )}
@@ -1339,7 +1390,14 @@ export const ElementStylePanel: React.FC<ElementStylePanelProps> = ({
                           placeholder="1.125"
                           className="flex-1 text-xs h-8"
                         />
-                        <span className="text-xs text-gray-500">rem</span>
+                        <select
+                          value={styles.buttonFontSizeUnit}
+                          onChange={(e) => handleHeroFontSizeUnitChange("buttonFontSizeUnit", e.target.value as "%" | "px" | "rem")}
+                          className="px-2 py-1 h-8 border border-gray-200 rounded text-xs font-medium bg-white cursor-pointer hover:border-gray-300 transition-colors"
+                        >
+                          <option value="rem">rem</option>
+                          <option value="px">px</option>
+                        </select>
                       </div>
                     </>
                   )}

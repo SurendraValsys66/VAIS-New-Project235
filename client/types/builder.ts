@@ -76,19 +76,19 @@ export interface BuilderComponent {
   heroSecondaryButtonText?: string;
   // Individual element styling for hero section
   headingFontSize?: number;
-  headingFontSizeUnit?: "px" | "%";
+  headingFontSizeUnit?: "px" | "%" | "rem";
   headingWidth?: number;
   headingWidthUnit?: "%" | "px";
   paragraphFontSize?: number;
-  paragraphFontSizeUnit?: "px" | "%";
+  paragraphFontSizeUnit?: "px" | "%" | "rem";
   paragraphWidth?: number;
   paragraphWidthUnit?: "%" | "px";
   badgeFontSize?: number;
-  badgeFontSizeUnit?: "px" | "%";
+  badgeFontSizeUnit?: "px" | "%" | "rem";
   badgeWidth?: number;
   badgeWidthUnit?: "%" | "px";
   buttonFontSize?: number;
-  buttonFontSizeUnit?: "px" | "%";
+  buttonFontSizeUnit?: "px" | "%" | "rem";
   buttonWidth?: number;
   buttonWidthUnit?: "%" | "px";
   // Track which hero element is currently selected for editing
