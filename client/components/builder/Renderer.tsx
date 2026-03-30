@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroSection } from "./HeroSection";
+import { FeaturesSection } from "./FeaturesSection";
 
 interface RendererProps {
   component: BuilderComponent;
@@ -674,31 +675,33 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
 
     case "feature-grid":
       return wrapWithControls(
-        <div className="p-12 bg-gray-50/50 rounded-3xl border border-gray-100" style={getComponentStyles()}>
-          <div className="text-center mb-16 space-y-4">
-            <h2 className="text-2xl font-bold text-gray-900" contentEditable suppressContentEditableWarning>
-              Everything you need to scale
-            </h2>
-            <p className="text-gray-600 max-w-xl mx-auto" contentEditable suppressContentEditableWarning>
-              Powerful tools designed to help you grow your business and reach your goals faster.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <div className="w-12 h-12 bg-valasys-orange/10 text-valasys-orange rounded-xl flex items-center justify-center font-bold">
-                  0{i}
-                </div>
-                <h3 className="text-lg font-bold" contentEditable suppressContentEditableWarning>
-                  {`Feature Item ${i}`}
-                </h3>
-                <p className="text-sm text-gray-500 leading-relaxed" contentEditable suppressContentEditableWarning>
-                  Explain how this feature solves a real problem for your users.
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>,
+        <FeaturesSection
+          block={{
+            id: component.id,
+            type: "feature-grid",
+            properties: {
+              heading: component.featureGridHeading || "Everything you need to scale",
+              description: component.featureGridDescription || "Powerful tools designed to help you grow your business and reach your goals faster.",
+              columns: component.featureGridColumns || 3,
+              features: component.features || [
+                { id: "f1", icon: "01", title: "Feature Item 1", description: "Explain how this feature solves a real problem for your users." },
+                { id: "f2", icon: "02", title: "Feature Item 2", description: "Explain how this feature solves a real problem for your users." },
+                { id: "f3", icon: "03", title: "Feature Item 3", description: "Explain how this feature solves a real problem for your users." },
+              ],
+            },
+          }}
+          onUpdate={(block) => {
+            onUpdate(component.id, {
+              featureGridHeading: block.properties.heading,
+              featureGridDescription: block.properties.description,
+              featureGridColumns: block.properties.columns,
+              features: block.properties.features,
+            });
+          }}
+          onSelect={(featureId) => {
+            onUpdate(component.id, { selectedFeatureId: featureId });
+          }}
+        />,
       );
 
     case "pricing":

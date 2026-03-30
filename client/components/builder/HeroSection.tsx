@@ -231,32 +231,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     const element = heroElements.find((el) => el.instanceId === instanceId);
     if (!element) return;
 
-    const elementsOfSameType = heroElements.filter((el) => el.type === element.type);
-    let nextElements = heroElements;
+    const nextElements = heroElements.filter((el) => el.instanceId !== instanceId);
     const updates: Partial<BuilderComponent> = { selectedHeroElement: null };
-
-    if (elementsOfSameType.length === 1) {
-      if (element.type === "buttons") {
-        nextElements = heroElements.map((el) =>
-          el.instanceId === instanceId
-            ? { ...el, content: defaultElementContent.buttons, secondaryContent: "Watch Demo" }
-            : el,
-        );
-        updates.heroPrimaryButtonText = defaultElementContent.buttons;
-        updates.heroSecondaryButtonText = "Watch Demo";
-      } else {
-        const resetContent = defaultElementContent[element.type];
-        nextElements = heroElements.map((el) =>
-          el.instanceId === instanceId ? { ...el, content: resetContent } : el,
-        );
-
-        if (element.type === "badge") updates.heroBadgeText = resetContent;
-        if (element.type === "heading") updates.heroHeadingText = resetContent;
-        if (element.type === "paragraph") updates.heroDescriptionText = resetContent;
-      }
-    } else {
-      nextElements = heroElements.filter((el) => el.instanceId !== instanceId);
-    }
 
     persistHeroElements(nextElements, updates);
     setSelectedElementId(null);

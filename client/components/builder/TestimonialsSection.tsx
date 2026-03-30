@@ -57,9 +57,6 @@ export const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({
   };
 
   const handleDeleteTestimonial = (testimonialId: string) => {
-    // Don't allow deleting if it's the only testimonial
-    if (testimonials.length === 1) return;
-
     const updatedTestimonials = testimonials.filter(t => t.id !== testimonialId);
     onUpdate({
       ...block,

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 interface FeaturesSectionProps {
   block: LandingPageBlock;
   onUpdate: (block: LandingPageBlock) => void;
+  onSelect?: (featureId: string | null) => void;
 }
 
 interface Feature {
@@ -21,6 +22,7 @@ interface Feature {
 export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   block,
   onUpdate,
+  onSelect,
 }) => {
   const [selectedFeatureId, setSelectedFeatureId] = React.useState<string | null>(null);
   const [hoveredFeatureId, setHoveredFeatureId] = React.useState<string | null>(null);
@@ -53,12 +55,10 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
     });
 
     setSelectedFeatureId(newFeatureId);
+    onSelect?.(newFeatureId);
   };
 
   const handleDeleteFeature = (featureId: string) => {
-    // Don't allow deleting if it's the only feature
-    if (features.length === 1) return;
-
     const updatedFeatures = features.filter(f => f.id !== featureId);
     onUpdate({
       ...block,
@@ -118,7 +118,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
             handleCopyFeature(featureId);
           }}
           className="h-6 w-6 flex items-center justify-center hover:bg-valasys-orange/10 rounded transition-colors cursor-pointer"
-          title="Duplicate feature"
+          title="Copy feature"
         >
           <Copy className="h-3.5 w-3.5" />
         </button>
@@ -130,7 +130,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
             handleAddFeature(featureId);
           }}
           className="h-6 w-6 flex items-center justify-center hover:bg-valasys-orange/10 rounded transition-colors cursor-pointer"
-          title="Duplicate feature"
+          title="Add feature"
         >
           <Plus className="h-3.5 w-3.5" />
         </button>
@@ -193,21 +193,31 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
               className={cn(
                 "relative group transition-all rounded-lg p-4 cursor-pointer",
                 isSelected(feature.id)
-                  ? "border-2 border-solid border-valasys-orange bg-valasys-orange/5"
+                  ? "border-2 border-solid border-valasys-orange bg-valasys-orange/5 shadow-lg shadow-valasys-orange/20"
                   : isHovered(feature.id)
-                  ? "border-2 border-dashed border-valasys-orange/50 bg-gray-50"
-                  : "border-2 border-transparent hover:bg-gray-50"
+                  ? "border-2 border-dashed border-valasys-orange bg-gray-50"
+                  : "border-2 border-transparent hover:border-2 hover:border-dashed hover:border-valasys-orange hover:bg-gray-50"
               )}
               onMouseEnter={() => setHoveredFeatureId(feature.id)}
               onMouseLeave={() => setHoveredFeatureId(null)}
               onClick={(e) => {
                 e.stopPropagation();
-                setSelectedFeatureId(selectedFeatureId === feature.id ? null : feature.id);
+                const newSelectedId = selectedFeatureId === feature.id ? null : feature.id;
+                setSelectedFeatureId(newSelectedId);
+                onSelect?.(newSelectedId);
               }}
             >
               {/* Icon */}
-              <div className="text-4xl mb-4">
-                {isSelected(feature.id) ? (
+              <div
+                className="text-4xl mb-4 cursor-text"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (isSelected(feature.id)) {
+                    setEditingFeatureId(feature.id);
+                  }
+                }}
+              >
+                {isSelected(feature.id) && editingFeatureId === feature.id ? (
                   <Input
                     value={feature.icon}
                     onChange={(e) => handleUpdateFeature(feature.id, { icon: e.target.value })}
@@ -216,14 +226,15 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
                     onClick={(e) => e.stopPropagation()}
                     className="h-auto w-12 border-0 bg-transparent p-0 text-center shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-4xl"
                     maxLength={2}
+                    autoFocus
                   />
                 ) : (
-                  <span>{feature.icon}</span>
+                  <span className={isSelected(feature.id) ? "opacity-70" : ""}>{feature.icon}</span>
                 )}
               </div>
 
               {/* Title */}
-              {isSelected(feature.id) ? (
+              {isSelected(feature.id) && editingFeatureId === feature.id ? (
                 <Input
                   value={feature.title}
                   onChange={(e) => handleUpdateFeature(feature.id, { title: e.target.value })}
@@ -231,16 +242,28 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
                   onBlur={() => setEditingFeatureId(null)}
                   onClick={(e) => e.stopPropagation()}
                   placeholder="Feature title"
-                  className="font-semibold text-gray-900 mb-2 border-0 bg-transparent shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="font-semibold text-gray-900 mb-2 border border-valasys-orange/20 bg-white px-2 py-1 rounded shadow-none focus-visible:ring-1 focus-visible:ring-valasys-orange focus-visible:ring-offset-0"
+                  autoFocus
                 />
               ) : (
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3
+                  className={cn(
+                    "text-lg font-semibold text-gray-900 mb-2 cursor-text",
+                    isSelected(feature.id) && "opacity-70 hover:opacity-100"
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isSelected(feature.id)) {
+                      setEditingFeatureId(feature.id);
+                    }
+                  }}
+                >
                   {feature.title}
                 </h3>
               )}
 
               {/* Description */}
-              {isSelected(feature.id) ? (
+              {isSelected(feature.id) && editingFeatureId === feature.id ? (
                 <Textarea
                   value={feature.description}
                   onChange={(e) => handleUpdateFeature(feature.id, { description: e.target.value })}
@@ -248,11 +271,25 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
                   onBlur={() => setEditingFeatureId(null)}
                   onClick={(e) => e.stopPropagation()}
                   placeholder="Feature description"
-                  className="text-sm text-gray-600 resize-none border-0 bg-transparent p-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="text-sm text-gray-600 resize-none border border-valasys-orange/20 bg-white px-2 py-1 rounded shadow-none focus-visible:ring-1 focus-visible:ring-valasys-orange focus-visible:ring-offset-0"
                   rows={3}
+                  autoFocus
                 />
               ) : (
-                <p className="text-sm text-gray-600">{feature.description}</p>
+                <p
+                  className={cn(
+                    "text-sm text-gray-600 cursor-text",
+                    isSelected(feature.id) && "opacity-70 hover:opacity-100"
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isSelected(feature.id)) {
+                      setEditingFeatureId(feature.id);
+                    }
+                  }}
+                >
+                  {feature.description}
+                </p>
               )}
 
               {renderControls(feature.id)}
