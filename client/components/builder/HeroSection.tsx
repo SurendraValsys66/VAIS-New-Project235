@@ -3,7 +3,6 @@ import { BuilderComponent } from "@/types/builder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Trash2, Copy, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
@@ -33,7 +32,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   );
   const [hoveredElementId, setHoveredElementId] = React.useState<string | null>(null);
   const [editingElementId, setEditingElementId] = React.useState<string | null>(null);
-  const [clipboardData, setClipboardData] = React.useState<{ elementId: string; content: string } | null>(null);
 
   // Sync selectedHeroElement from component prop
   React.useEffect(() => {
@@ -100,13 +98,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     return styles;
   };
 
-  const handleElementClick = (elementId: string) => {
+  const handleElementClick = (elementId: string, event?: React.MouseEvent) => {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     const newSelectedId = selectedElementId === elementId ? null : elementId;
     setSelectedElementId(newSelectedId);
     // Update the component to track which element is selected
     onUpdate(component.id, {
       selectedHeroElement: (newSelectedId as "badge" | "heading" | "paragraph" | "buttons" | null) || null
     });
+    console.log("[HeroSection] Selected element:", newSelectedId);
   };
 
   const handleElementUpdate = (elementId: string, content: string) => {
@@ -143,97 +146,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     resizeTextarea(paragraphTextareaRef.current);
   }, [component.heroHeadingText, component.heroDescriptionText, editingElementId]);
 
-  const handleCopyElement = (elementId: string) => {
-    // Get the actual current content from the component
-    const contentMap: Record<string, string> = {
-      badge: component.heroBadgeText || "✨ New Release",
-      heading: component.heroHeadingText || "Build your vision faster than ever.",
-      paragraph: component.heroDescriptionText || "The world's most advanced landing page builder. Drag, drop, and launch in minutes, not days.",
-      primaryButton: component.heroPrimaryButtonText || "Start Free Trial",
-      secondaryButton: component.heroSecondaryButtonText || "Watch Demo",
-    };
-
-    const contentToCopy = contentMap[elementId] || "";
-
-    // Store in local clipboard state
-    setClipboardData({ elementId, content: contentToCopy });
-
-    // Also copy to browser clipboard
-    navigator.clipboard.writeText(contentToCopy).then(() => {
-      console.log("Copied to clipboard:", contentToCopy);
-    }).catch(err => {
-      console.error("Failed to copy:", err);
-    });
-  };
-
-  const handleDeleteElement = (elementId: string) => {
-    // Reset element to default value
-    const defaultContent: Record<string, string> = {
-      badge: "✨ New Release",
-      heading: "Build your vision faster than ever.",
-      paragraph: "The world's most advanced landing page builder. Drag, drop, and launch in minutes, not days.",
-      primaryButton: "Start Free Trial",
-      secondaryButton: "Watch Demo",
-    };
-
-    const updateMap: Record<string, keyof BuilderComponent> = {
-      badge: "heroBadgeText",
-      heading: "heroHeadingText",
-      paragraph: "heroDescriptionText",
-      primaryButton: "heroPrimaryButtonText",
-      secondaryButton: "heroSecondaryButtonText",
-    };
-
-    const key = updateMap[elementId];
-    if (key && defaultContent[elementId]) {
-      onUpdate(component.id, { [key]: defaultContent[elementId] });
-      setSelectedElementId(null);
-      console.log("Element reset to default:", defaultContent[elementId]);
-    }
-  };
-
-  const handleAddElement = (elementId: string) => {
-    // Paste clipboard content or duplicate current element
-    const updateMap: Record<string, keyof BuilderComponent> = {
-      badge: "heroBadgeText",
-      heading: "heroHeadingText",
-      paragraph: "heroDescriptionText",
-      primaryButton: "heroPrimaryButtonText",
-      secondaryButton: "heroSecondaryButtonText",
-    };
-
-    if (clipboardData) {
-      // If clipboard has data, paste it to the target element
-      const sourceKey = updateMap[clipboardData.elementId];
-      const targetKey = updateMap[elementId];
-
-      if (sourceKey && targetKey) {
-        onUpdate(component.id, { [targetKey]: clipboardData.content });
-        console.log("Pasted content:", clipboardData.content);
-        setClipboardData(null);
-      }
-    } else {
-      // Otherwise duplicate the current element by copying its content to itself
-      // (In the context of hero elements, this creates a duplicate)
-      const currentValue =
-        elementId === "badge" ? component.heroBadgeText :
-        elementId === "heading" ? component.heroHeadingText :
-        elementId === "paragraph" ? component.heroDescriptionText :
-        elementId === "primaryButton" ? component.heroPrimaryButtonText :
-        elementId === "secondaryButton" ? component.heroSecondaryButtonText :
-        "";
-
-      const key = updateMap[elementId];
-      if (key && currentValue) {
-        // Copy to clipboard for next paste operation
-        setClipboardData({ elementId, content: currentValue });
-        navigator.clipboard.writeText(currentValue).catch(err => {
-          console.error("Failed to copy:", err);
-        });
-        console.log("Duplicated element, copied to clipboard:", currentValue);
-      }
-    }
-  };
 
   const renderElementContent = (element: HeroElement) => {
     const isSelected = selectedElementId === element.id;
@@ -270,56 +182,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       borderClasses
     );
 
+    // Element-level controls are disabled since hero section has fixed elements.
+    // Use the component-level buttons (copy/add/delete) at the top-right of the entire hero section instead.
     const renderControls = () => {
-      if (!isSelected || editingElementId === element.id) return null;
-
-      return (
-        <div
-          className="absolute top-1 right-1 flex items-center gap-1 bg-white rounded-md shadow-lg border border-valasys-orange/20 z-[100] pointer-events-auto"
-          onMouseDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleCopyElement(element.id);
-              console.log("Copy clicked for element:", element.id);
-            }}
-            className="h-6 w-6 flex items-center justify-center hover:bg-valasys-orange/10 rounded transition-colors cursor-pointer"
-            title={`Copy element (${clipboardData ? "has clipboard data" : "empty"})`}
-          >
-            <Copy className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleAddElement(element.id);
-              console.log("Add/Paste clicked for element:", element.id);
-            }}
-            className="h-6 w-6 flex items-center justify-center hover:bg-valasys-orange/10 rounded transition-colors cursor-pointer"
-            title={clipboardData ? "Paste content" : "Duplicate element"}
-          >
-            <Plus className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDeleteElement(element.id);
-              console.log("Delete clicked for element:", element.id);
-            }}
-            className="h-6 w-6 flex items-center justify-center hover:bg-red-100 text-red-500 rounded transition-colors cursor-pointer"
-            title="Reset element to default"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      );
+      // Returning null to hide element-level buttons
+      // Component-level buttons in Renderer wrapper handle duplication/deletion
+      return null;
     };
 
     const onMouseEnter = () => setHoveredElementId(element.id);
@@ -341,7 +209,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             )}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onClick={() => handleElementClick(element.id)}
+            onClick={(e) => handleElementClick(element.id, e)}
             style={{ maxWidth: badgeWidth || "100%", textAlign: badgeTextAlign }}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-valasys-orange/10 text-valasys-orange font-bold uppercase tracking-wider" style={{ fontSize: badgeFontSize || "0.75rem" }}>
@@ -386,7 +254,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             className={cn(containerClasses, "relative")}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onClick={() => handleElementClick(element.id)}
+            onClick={(e) => handleElementClick(element.id, e)}
             style={{ textAlign: headingTextAlign }}
           >
             {isSelected ? (
@@ -440,7 +308,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             className={cn(containerClasses, "relative w-full self-stretch")}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onClick={() => handleElementClick(element.id)}
+            onClick={(e) => handleElementClick(element.id, e)}
             style={{ textAlign: paragraphTextAlign }}
           >
             {isSelected ? (
@@ -495,7 +363,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             className={containerClasses}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
-            onClick={() => handleElementClick(element.id)}
+            onClick={(e) => handleElementClick(element.id, e)}
             style={{ textAlign: buttonTextAlign }}
           >
             <div className="flex flex-wrap items-center justify-center gap-4 mt-4" style={{ maxWidth: buttonsWidth || "100%", fontSize: buttonFontSize || "1.125rem", textAlign: buttonTextAlign }}>
