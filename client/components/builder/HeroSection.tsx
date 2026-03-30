@@ -3,6 +3,7 @@ import { BuilderComponent } from "@/types/builder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Trash2, Copy, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface HeroSectionProps {
@@ -32,6 +33,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   );
   const [hoveredElementId, setHoveredElementId] = React.useState<string | null>(null);
   const [editingElementId, setEditingElementId] = React.useState<string | null>(null);
+  const [clipboardData, setClipboardData] = React.useState<{ elementId: string; content: string } | null>(null);
 
   // Sync selectedHeroElement from component prop
   React.useEffect(() => {
@@ -131,6 +133,82 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     setEditingElementId(event.currentTarget.dataset.elementId || null);
   };
 
+  const handleCopyElement = (elementId: string) => {
+    const contentMap: Record<string, string> = {
+      badge: component.heroBadgeText || "✨ New Release",
+      heading: component.heroHeadingText || "Build your vision faster than ever.",
+      paragraph: component.heroDescriptionText || "The world's most advanced landing page builder. Drag, drop, and launch in minutes, not days.",
+      primaryButton: component.heroPrimaryButtonText || "Start Free Trial",
+      secondaryButton: component.heroSecondaryButtonText || "Watch Demo",
+    };
+
+    const contentToCopy = contentMap[elementId] || "";
+    setClipboardData({ elementId, content: contentToCopy });
+    navigator.clipboard.writeText(contentToCopy).catch(err => {
+      console.error("[HeroSection] Failed to copy:", err);
+    });
+  };
+
+  const handleDeleteElement = (elementId: string) => {
+    const defaultContent: Record<string, string> = {
+      badge: "✨ New Release",
+      heading: "Build your vision faster than ever.",
+      paragraph: "The world's most advanced landing page builder. Drag, drop, and launch in minutes, not days.",
+      primaryButton: "Start Free Trial",
+      secondaryButton: "Watch Demo",
+    };
+
+    const updateMap: Record<string, keyof BuilderComponent> = {
+      badge: "heroBadgeText",
+      heading: "heroHeadingText",
+      paragraph: "heroDescriptionText",
+      primaryButton: "heroPrimaryButtonText",
+      secondaryButton: "heroSecondaryButtonText",
+    };
+
+    const key = updateMap[elementId];
+    if (key && defaultContent[elementId]) {
+      onUpdate(component.id, { [key]: defaultContent[elementId] });
+      setSelectedElementId(null);
+    }
+  };
+
+  const handleAddElement = (elementId: string) => {
+    const updateMap: Record<string, keyof BuilderComponent> = {
+      badge: "heroBadgeText",
+      heading: "heroHeadingText",
+      paragraph: "heroDescriptionText",
+      primaryButton: "heroPrimaryButtonText",
+      secondaryButton: "heroSecondaryButtonText",
+    };
+
+    if (clipboardData) {
+      const sourceKey = updateMap[clipboardData.elementId];
+      const targetKey = updateMap[elementId];
+
+      if (sourceKey && targetKey) {
+        onUpdate(component.id, { [targetKey]: clipboardData.content });
+        setClipboardData(null);
+      }
+    } else {
+      const currentValue =
+        elementId === "badge" ? component.heroBadgeText :
+        elementId === "heading" ? component.heroHeadingText :
+        elementId === "paragraph" ? component.heroDescriptionText :
+        elementId === "primaryButton" ? component.heroPrimaryButtonText :
+        elementId === "secondaryButton" ? component.heroSecondaryButtonText :
+        "";
+
+      const key = updateMap[elementId];
+      if (key && currentValue) {
+        setClipboardData({ elementId, content: currentValue });
+        navigator.clipboard.writeText(currentValue).catch(err => {
+          console.error("[HeroSection] Failed to copy:", err);
+        });
+      }
+    }
+  };
+
   const headingTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const paragraphTextareaRef = React.useRef<HTMLTextAreaElement | null>(null);
 
@@ -182,12 +260,53 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
       borderClasses
     );
 
-    // Element-level controls are disabled since hero section has fixed elements.
-    // Use the component-level buttons (copy/add/delete) at the top-right of the entire hero section instead.
     const renderControls = () => {
-      // Returning null to hide element-level buttons
-      // Component-level buttons in Renderer wrapper handle duplication/deletion
-      return null;
+      if (!isSelected || editingElementId === element.id) return null;
+
+      return (
+        <div
+          className="absolute top-1 right-1 flex items-center gap-1 bg-white rounded-md shadow-lg border border-valasys-orange/20 z-[100] pointer-events-auto"
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleCopyElement(element.id);
+            }}
+            className="h-6 w-6 flex items-center justify-center hover:bg-valasys-orange/10 rounded transition-colors cursor-pointer"
+            title="Copy content"
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleAddElement(element.id);
+            }}
+            className="h-6 w-6 flex items-center justify-center hover:bg-valasys-orange/10 rounded transition-colors cursor-pointer"
+            title={clipboardData ? "Paste content" : "Copy for pasting"}
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleDeleteElement(element.id);
+            }}
+            className="h-6 w-6 flex items-center justify-center hover:bg-red-100 text-red-500 rounded transition-colors cursor-pointer"
+            title="Reset to default"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      );
     };
 
     const onMouseEnter = () => setHoveredElementId(element.id);
