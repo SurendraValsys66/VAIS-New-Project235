@@ -1,5 +1,5 @@
 import React from "react";
-import { Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { Trash2, ChevronUp, ChevronDown, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LandingPage, LandingPageBlock } from "./types";
 import {
@@ -24,6 +24,7 @@ interface LandingPagePreviewProps {
   onUpdateBlock: (blockId: string, properties: Record<string, any>) => void;
   onDeleteBlock: (blockId: string) => void;
   onMoveBlock: (blockId: string, direction: "up" | "down") => void;
+  onDuplicateBlock?: (blockId: string) => void;
 }
 
 export const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
@@ -33,6 +34,7 @@ export const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
   onUpdateBlock,
   onDeleteBlock,
   onMoveBlock,
+  onDuplicateBlock,
 }) => {
   const renderBlock = (block: LandingPageBlock, index: number) => {
     const isSelected = selectedBlockId === block.id;
@@ -103,6 +105,18 @@ export const LandingPagePreview: React.FC<LandingPagePreviewProps> = ({
 
         {isSelected && (
           <div className="absolute top-2 right-2 flex gap-2 bg-white rounded-lg shadow-lg p-1 z-20">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8 w-8 p-0 hover:bg-gray-100"
+              title="Copy block"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicateBlock?.(block.id);
+              }}
+            >
+              <Copy className="w-4 h-4" />
+            </Button>
             <Button
               size="sm"
               variant="ghost"
