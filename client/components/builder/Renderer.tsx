@@ -49,10 +49,12 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
 }) => {
 
   const handleCopyComponent = () => {
+    console.log("[Renderer] Copy clicked for component:", component.id, "type:", component.type);
     onDuplicate(component.id);
   };
 
   const handleAddSibling = () => {
+    console.log("[Renderer] Add sibling clicked for component:", component.id, "parentId:", parentId, "parentIndex:", parentIndex);
     // Add as a sibling at the same level, not as a child
     onAdd(component.type, parentId || null, (parentIndex || 0) + 1);
   };
@@ -296,6 +298,7 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
               className="h-6 w-6 hover:bg-red-100 text-red-500"
               onClick={(e) => {
                 e.stopPropagation();
+                console.log("[Renderer] Delete clicked for component:", component.id);
                 onRemove(component.id);
               }}
               title="Delete element"
