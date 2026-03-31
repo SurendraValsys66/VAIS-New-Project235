@@ -355,7 +355,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({ onClose }) => {
                         updateStyle("paddingBottom", validated);
                         updateStyle("paddingLeft", validated);
                       }}
-                      className="w-12 text-xs h-7"
+                      className="w-16 text-xs h-7"
                     />
                     <Select value={paddingUnit} onValueChange={(val) => setPaddingUnit(val as "px" | "%")}>
                       <SelectTrigger className="w-16 h-7 text-xs">
@@ -412,7 +412,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({ onClose }) => {
                             const validated = validateSpacingValue(e.target.value, paddingUnit);
                             updateStyle(key as keyof StyleState, validated);
                           }}
-                          className="w-10 text-xs h-7"
+                          className="w-16 text-xs h-7"
                         />
                         <Select value={paddingUnit} onValueChange={(val) => setPaddingUnit(val as "px" | "%")}>
                           <SelectTrigger className="w-14 h-7 text-xs">
@@ -478,7 +478,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({ onClose }) => {
                         updateStyle("marginBottom", validated);
                         updateStyle("marginLeft", validated);
                       }}
-                      className="w-12 text-xs h-7"
+                      className="w-16 text-xs h-7"
                     />
                     <Select value={marginUnit} onValueChange={(val) => setMarginUnit(val as "px" | "%")}>
                       <SelectTrigger className="w-16 h-7 text-xs">
@@ -535,7 +535,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({ onClose }) => {
                             const validated = validateSpacingValue(e.target.value, marginUnit);
                             updateStyle(key as keyof StyleState, validated);
                           }}
-                          className="w-10 text-xs h-7"
+                          className="w-16 text-xs h-7"
                         />
                         <Select value={marginUnit} onValueChange={(val) => setMarginUnit(val as "px" | "%")}>
                           <SelectTrigger className="w-14 h-7 text-xs">
