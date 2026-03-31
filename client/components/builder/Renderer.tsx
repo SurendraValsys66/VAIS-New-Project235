@@ -234,6 +234,8 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
 
   const [hoveredPricingPlan, setHoveredPricingPlan] = React.useState<string | null>(null);
   const [selectedPricingPlan, setSelectedPricingPlan] = React.useState<string | null>(null);
+  const [hoveredPricingText, setHoveredPricingText] = React.useState<string | null>(null);
+  const [selectedPricingText, setSelectedPricingText] = React.useState<string | null>(null);
 
   if (!isVisibleOnPreviewDevice()) {
     return null;
@@ -726,8 +728,48 @@ export const ComponentRenderer: React.FC<RendererProps> = ({
       return wrapWithControls(
         <div className="p-12 bg-white rounded-3xl border border-gray-100" style={getComponentStyles()}>
           <div className="text-center mb-12">
-            <h2 className="text-2xl font-black mb-4" contentEditable suppressContentEditableWarning>Simple, transparent pricing</h2>
-            <p className="text-gray-500" contentEditable suppressContentEditableWarning>Choose the plan that's right for you.</p>
+            <div
+              className="mb-4 rounded-2xl px-4 py-2 transition-all"
+              onMouseEnter={() => setHoveredPricingText("heading")}
+              onMouseLeave={() => setHoveredPricingText((currentText) => (currentText === "heading" ? null : currentText))}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedPricingText((currentText) => (currentText === "heading" ? null : "heading"));
+                onSelect?.(component.id);
+              }}
+              style={{
+                border: selectedPricingText === "heading"
+                  ? "2px solid #FF6A00"
+                  : hoveredPricingText === "heading"
+                    ? "2px dashed #FF6A00"
+                    : "2px solid transparent",
+              }}
+            >
+              <h2 className="text-2xl font-black" contentEditable suppressContentEditableWarning>
+                Simple, transparent pricing
+              </h2>
+            </div>
+            <div
+              className="rounded-2xl px-4 py-2 transition-all"
+              onMouseEnter={() => setHoveredPricingText("subheading")}
+              onMouseLeave={() => setHoveredPricingText((currentText) => (currentText === "subheading" ? null : currentText))}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedPricingText((currentText) => (currentText === "subheading" ? null : "subheading"));
+                onSelect?.(component.id);
+              }}
+              style={{
+                border: selectedPricingText === "subheading"
+                  ? "2px solid #FF6A00"
+                  : hoveredPricingText === "subheading"
+                    ? "2px dashed #FF6A00"
+                    : "2px solid transparent",
+              }}
+            >
+              <p className="text-gray-500" contentEditable suppressContentEditableWarning>
+                Choose the plan that's right for you.
+              </p>
+            </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {["Starter", "Pro", "Enterprise"].map((plan, i) => {
