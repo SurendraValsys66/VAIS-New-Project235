@@ -445,6 +445,44 @@ export const PricingBlockPreview: React.FC<BlockPreviewProps> = ({
     onUpdate({ pricingTiers: updatedTiers });
   };
 
+  const handleAddFeature = (e: React.MouseEvent, tierId: string, featureText: string) => {
+    e.stopPropagation();
+    const updatedTiers = props.pricingTiers?.map((tier: any) => {
+      if (tier.id === tierId) {
+        return {
+          ...tier,
+          features: [...(tier.features || []), featureText],
+        };
+      }
+      return tier;
+    }) || [];
+    onUpdate({ pricingTiers: updatedTiers });
+  };
+
+  const handleDeleteFeature = (e: React.MouseEvent, tierId: string, featureIndex: number) => {
+    e.stopPropagation();
+    const updatedTiers = props.pricingTiers?.map((tier: any) => {
+      if (tier.id === tierId) {
+        return {
+          ...tier,
+          features: tier.features?.filter((_: string, i: number) => i !== featureIndex) || [],
+        };
+      }
+      return tier;
+    }) || [];
+    onUpdate({ pricingTiers: updatedTiers });
+  };
+
+  const handleUpdateTierElement = (tierId: string, field: string, value: any) => {
+    const updatedTiers = props.pricingTiers?.map((tier: any) => {
+      if (tier.id === tierId) {
+        return { ...tier, [field]: value };
+      }
+      return tier;
+    }) || [];
+    onUpdate({ pricingTiers: updatedTiers });
+  };
+
   return (
     <div
       onClick={onSelect}
@@ -564,47 +602,171 @@ export const PricingBlockPreview: React.FC<BlockPreviewProps> = ({
               }}
               onClick={(e) => handleTierClick(e, tier.id)}
             >
-              <h3 className="text-lg font-semibold mb-2">{tier.name}</h3>
-              <div className="text-4xl font-bold mb-2">{tier.price}</div>
-              <p
-                className={`text-sm mb-6 ${tier.isHighlighted ? "text-gray-300" : "text-gray-600"}`}
+              {/* Tier Name */}
+              <div
+                className="mb-2 p-2 rounded cursor-pointer border-2 border-transparent hover:border-orange-300 transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
-                {tier.description}
-              </p>
+                <h3 className="text-lg font-semibold mb-2">{tier.name}</h3>
+                {selectedTierId === tier.id && (
+                  <div className="flex gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(tier.name);
+                      }}
+                      className="flex-1 bg-blue-400 hover:bg-blue-500 text-white py-1 rounded text-xs transition-colors"
+                      title="Copy"
+                    >
+                      📋
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Tier Price */}
+              <div
+                className="mb-2 p-2 rounded cursor-pointer border-2 border-transparent hover:border-orange-300 transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <div className="text-4xl font-bold mb-2">{tier.price}</div>
+                {selectedTierId === tier.id && (
+                  <div className="flex gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(tier.price);
+                      }}
+                      className="flex-1 bg-blue-400 hover:bg-blue-500 text-white py-1 rounded text-xs transition-colors"
+                      title="Copy"
+                    >
+                      📋
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Tier Description */}
+              <div
+                className="mb-6 p-2 rounded cursor-pointer border-2 border-transparent hover:border-orange-300 transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <p
+                  className={`text-sm ${tier.isHighlighted ? "text-gray-300" : "text-gray-600"}`}
+                >
+                  {tier.description}
+                </p>
+                {selectedTierId === tier.id && (
+                  <div className="flex gap-1 mt-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(tier.description);
+                      }}
+                      className="flex-1 bg-blue-400 hover:bg-blue-500 text-white py-1 rounded text-xs transition-colors"
+                      title="Copy"
+                    >
+                      📋
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Features List */}
               <ul
-                className={`text-sm mb-8 space-y-2 ${
+                className={`text-sm mb-8 space-y-2 p-2 rounded border-2 border-transparent hover:border-orange-300 transition-all ${
                   tier.isHighlighted ? "text-gray-300" : "text-gray-600"
                 }`}
               >
                 {tier.features?.map((feature: string, i: number) => (
-                  <li key={i}>• {feature}</li>
+                  <li key={i} className="flex items-center justify-between group">
+                    <span>• {feature}</span>
+                    {selectedTierId === tier.id && (
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(feature);
+                          }}
+                          className="bg-blue-400 hover:bg-blue-500 text-white py-0.5 px-1.5 rounded text-xs transition-colors"
+                          title="Copy"
+                        >
+                          📋
+                        </button>
+                        <button
+                          onClick={(e) => handleAddFeature(e, tier.id, feature)}
+                          className="bg-green-400 hover:bg-green-500 text-white py-0.5 px-1.5 rounded text-xs transition-colors"
+                          title="Duplicate"
+                        >
+                          ➕
+                        </button>
+                        <button
+                          onClick={(e) => handleDeleteFeature(e, tier.id, i)}
+                          className="bg-red-400 hover:bg-red-500 text-white py-0.5 px-1.5 rounded text-xs transition-colors"
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
+                  </li>
                 ))}
               </ul>
-              <button
-                style={{
-                  backgroundColor: tier.buttonColor,
-                  color: tier.buttonTextColor,
-                }}
-                className="w-full py-2 rounded font-medium hover:opacity-90 transition-opacity"
-              >
-                {tier.buttonText}
-              </button>
 
+              {/* Button Text */}
+              <div
+                className="p-2 rounded cursor-pointer border-2 border-transparent hover:border-orange-300 transition-all"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <button
+                  style={{
+                    backgroundColor: tier.buttonColor,
+                    color: tier.buttonTextColor,
+                  }}
+                  className="w-full py-2 rounded font-medium hover:opacity-90 transition-opacity"
+                >
+                  {tier.buttonText}
+                </button>
+                {selectedTierId === tier.id && (
+                  <div className="flex gap-1 mt-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigator.clipboard.writeText(tier.buttonText);
+                      }}
+                      className="flex-1 bg-blue-400 hover:bg-blue-500 text-white py-1 rounded text-xs transition-colors"
+                      title="Copy"
+                    >
+                      📋
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Tier Level Controls */}
               {selectedTierId === tier.id && (
                 <div className="mt-4 flex gap-2 pt-4 border-t border-gray-300">
                   <button
                     onClick={(e) => handleCopyTier(e, tier)}
                     className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded font-medium text-sm transition-colors flex items-center justify-center gap-1"
-                    title="Copy tier details"
+                    title="Copy entire tier"
                   >
-                    <span>📋</span> Copy
+                    <span>📋</span> Copy Tier
                   </button>
                   <button
                     onClick={(e) => handleAddTier(e, tier)}
                     className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded font-medium text-sm transition-colors flex items-center justify-center gap-1"
-                    title="Add a duplicate tier"
+                    title="Duplicate entire tier"
                   >
-                    <span>➕</span> Add
+                    <span>➕</span> Add Tier
                   </button>
                   <button
                     onClick={(e) => handleDeleteTier(e, tier.id)}
