@@ -15,14 +15,25 @@ interface PageData {
   name: string;
   updatedAt: string;
   thumbnail?: string;
+  templateImage?: string;
 }
 
 export default function LandingPages() {
   const [view, setView] = useState<View>("list");
   const [searchQuery, setSearchQuery] = useState("");
   const [pages, setPages] = useState<PageData[]>([
-    { id: "1", name: "Modern Hero Page", updatedAt: "2024-03-20T10:00:00Z" },
-    { id: "2", name: "SaaS Product Landing", updatedAt: "2024-03-19T15:30:00Z" },
+    {
+      id: "1",
+      name: "Modern Hero Page",
+      updatedAt: "2024-03-20T10:00:00Z",
+      templateImage: "https://cdn.builder.io/api/v1/image/assets%2Fddd1f2eefed243f880ce4c077bf467dd%2Fc791842089ab4e8a8223fa1c37011b01?format=webp&width=800&height=1200"
+    },
+    {
+      id: "2",
+      name: "SaaS Product Landing",
+      updatedAt: "2024-03-19T15:30:00Z",
+      templateImage: "https://cdn.builder.io/api/v1/image/assets%2Fddd1f2eefed243f880ce4c077bf467dd%2Fce37966ddf2b45dca81b913547a9f779?format=webp&width=800&height=1200"
+    },
   ]);
 
   const handleCreateNew = () => {
@@ -117,9 +128,9 @@ export default function LandingPages() {
                     {/* Auto-scrolling template image */}
                     <div className="relative w-full h-full overflow-hidden">
                       <img
-                        src="https://cdn.builder.io/api/v1/image/assets%2Fddd1f2eefed243f880ce4c077bf467dd%2Fc791842089ab4e8a8223fa1c37011b01?format=webp&width=800&height=1200"
+                        src={page.templateImage || "https://cdn.builder.io/api/v1/image/assets%2Fddd1f2eefed243f880ce4c077bf467dd%2Fc791842089ab4e8a8223fa1c37011b01?format=webp&width=800&height=1200"}
                         alt="Template preview"
-                        className="w-full h-auto object-cover transition-transform duration-[95s] ease-linear group-hover:translate-y-[-600px]"
+                        className="w-full h-auto object-cover transition-transform duration-[35s] ease-linear group-hover:translate-y-[-600px]"
                       />
                     </div>
 
