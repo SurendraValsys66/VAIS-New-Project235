@@ -154,7 +154,7 @@ export default function LandingPages() {
                       <img
                         src={page.templateImage || "https://cdn.builder.io/api/v1/image/assets%2Fddd1f2eefed243f880ce4c077bf467dd%2Fc791842089ab4e8a8223fa1c37011b01?format=webp&width=800&height=1200"}
                         alt="Template preview"
-                        className="w-full h-auto object-cover transition-transform duration-[35s] ease-linear group-hover:translate-y-[-600px]"
+                        className="w-full h-auto object-cover transition-transform duration-[60s] ease-linear group-hover:translate-y-[-600px]"
                       />
                     </div>
 
